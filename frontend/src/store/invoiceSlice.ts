@@ -1,5 +1,13 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiCreateInvoice, apiFetchInvoices } from "../api/invoiceApi";
+import { AppDispatch, RootState } from "./store";
+
+const createAppAsyncThunk = createAsyncThunk.withTypes<{
+  state: RootState
+  dispatch: AppDispatch
+  rejectValue: string
+  extra: { s: string; n: number }
+}>()
 
 interface Product {
   name: string;
@@ -30,16 +38,15 @@ const initialState: InvoicesState = {
   error: null,
 };
 
-export const fetchInvoices = createAsyncThunk(
+export const fetchInvoices = createAppAsyncThunk(
   "invoices/fetchInvoices",
   async () => {
     const response = await apiFetchInvoices();
-    console.log('response', response)
-    return response.data;
+    return response;
   }
 );
 
-export const addInvoice = createAsyncThunk(
+export const addInvoice = createAppAsyncThunk(
   "invoices/addInvoice",
   async (newInvoice: Invoice) => {
     const response = await apiCreateInvoice(newInvoice);
@@ -51,10 +58,10 @@ const invoicesSlice = createSlice({
   name: "invoices",
   initialState,
   reducers: {
-    setInvoices: (state, action: PayloadAction<Invoice[]>) => {
+    setInvoices: (state, action) => {
       state.invoices = action.payload;
-      console.log('action.payload', action.payload)
-      console.log('state.invoices', state.invoices)
+      // console.log('action.payload', action.payload)
+      // console.log('state.invoices', state.invoices)
     },
   },
   extraReducers: (builder) => {
@@ -64,7 +71,7 @@ const invoicesSlice = createSlice({
       })
       .addCase(
         fetchInvoices.fulfilled,
-        (state, action: PayloadAction<Invoice[]>) => {
+        (state, action) => {
           state.status = "succeeded";
           state.invoices = action.payload;
         }
@@ -75,7 +82,7 @@ const invoicesSlice = createSlice({
       })
       .addCase(
         addInvoice.fulfilled,
-        (state, action: PayloadAction<Invoice>) => {
+        (state, action) => {
           state.invoices.push(action.payload);
         }
       )
