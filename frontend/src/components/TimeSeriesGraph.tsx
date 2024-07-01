@@ -46,7 +46,7 @@ const TimeSeriesGraph: React.FC<TimeSeriesGraphProps> = ({ data, period }) => {
   }, [data]);
 
   const transformDataForPeriod = (data: { date: string; revenue: number }[]) => {
-    console.log('data', data)
+    // console.log('data', data)
     const transformedData = data.map((item) => ({
       x: new Date(item.date),
       y: item.revenue,

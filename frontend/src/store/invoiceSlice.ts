@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiCreateInvoice, apiFetchInvoices } from "../api/invoiceApi";
 import { AppDispatch, RootState } from "./store";
+import { Invoice } from "../types";
 
 const createAppAsyncThunk = createAsyncThunk.withTypes<{
   state: RootState
@@ -8,23 +9,6 @@ const createAppAsyncThunk = createAsyncThunk.withTypes<{
   rejectValue: string
   extra: { s: string; n: number }
 }>()
-
-interface Product {
-  name: string;
-  picture: string;
-  stock: number;
-  price: number;
-}
-
-interface Invoice {
-  id: number;
-  date: string;
-  customerName: string;
-  salespersonName: string;
-  notes: string;
-  products: Product[];
-  totalAmount: number;
-}
 
 interface InvoicesState {
   invoices: Invoice[];
@@ -49,8 +33,13 @@ export const fetchInvoices = createAppAsyncThunk(
 export const addInvoice = createAppAsyncThunk(
   "invoices/addInvoice",
   async (newInvoice: Invoice) => {
-    const response = await apiCreateInvoice(newInvoice);
-    return response.data;
+    try {
+      const response = await apiCreateInvoice(newInvoice);
+      return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      return err;
+    }
   }
 );
 

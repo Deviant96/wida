@@ -1,4 +1,5 @@
 export interface Product {
+  id?: number;
   name: string;
   picture: string;
   stock: number;
@@ -6,11 +7,11 @@ export interface Product {
 }
 
 export interface Invoice {
-  id: number;
+  id?: number;
   date: string;
   customerName: string;
   salespersonName: string;
-  notes: string;
+  notes?: string;
   products: Product[];
   totalAmount: number;
 }

@@ -1,14 +1,6 @@
 import db from "../db";
 import mysql from "mysql2";
-
-interface Invoice {
-  id?: number;
-  date: string;
-  customerName: string;
-  salespersonName: string;
-  notes?: string;
-  totalAmount: number;
-}
+import { Invoice } from "../types";
 
 const InvoiceModel = {
   create: (
@@ -16,7 +8,7 @@ const InvoiceModel = {
     callback: (err: mysql.QueryError | null, results: any) => void
   ) => {
     const query =
-      "INSERT INTO invoices (date, customerName, salespersonName, notes, totalAmount) VALUES (?, ?, ?, ?, ?)";
+      "INSERT INTO invoices (date, customerName, salespersonName, notes, products, totalAmount) VALUES (?, ?, ?, ?, ?, ?)";
     db.query(
       query,
       [
@@ -24,6 +16,7 @@ const InvoiceModel = {
         invoice.customerName,
         invoice.salespersonName,
         invoice.notes,
+        JSON.stringify(invoice.products),
         invoice.totalAmount,
       ],
       callback
