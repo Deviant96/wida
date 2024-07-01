@@ -1,62 +1,121 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Line } from 'react-chartjs-2';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from 'recharts';
-import { Invoice } from '../types';
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+} from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
+import 'chartjs-adapter-date-fns';
+import { enUS } from 'date-fns/locale';
+import mockInvoiceData from '../utils/mockInvoiceData';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+  zoomPlugin
+);
 
 interface TimeSeriesGraphProps {
-  data: { date: string, revenue: number }[];
+  data: { date: string; revenue: number }[];
+  period: 'daily' | 'weekly' | 'monthly';
 }
 
-const TimeSeriesGraph: React.FC<TimeSeriesGraphProps> = ({ data }) => {
+const TimeSeriesGraph: React.FC<TimeSeriesGraphProps> = ({ data, period }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chartRef = useRef<any>(null);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+
+    if (chart) {
+      chart.resetZoom();
+    }
+  }, [data]);
+
+  const transformDataForPeriod = (data: { date: string; revenue: number }[]) => {
+    console.log('data', data)
+    const transformedData = data.map((item) => ({
+      x: new Date(item.date),
+      y: item.revenue,
+    }));
+    return transformedData;
+  };
+
+  const chartData = {
+    datasets: [
+      {
+        label: 'Revenue',
+        data: transformDataForPeriod(mockInvoiceData),
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    adapters: {
+      date: {
+          locale: enUS
+      }
+    },
+    scales: {
+      x: {
+        type: 'time',
+        time: {
+          unit: period === 'daily' ? 'day' : period === 'weekly' ? 'week' : 'month',
+          tooltipFormat: 'PP',
+        },
+        title: {
+          display: true,
+          text: 'Date',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Revenue (Rp)',
+        },
+      },
+    },
+    plugins: {
+      zoom: {
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: 'x',
+        },
+        pan: {
+          enabled: true,
+          mode: 'x',
+        },
+      },
+    },
+  };
+
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart
-        width={500}
-        height={300}
-        data={data}
-        margin={{
-          top: 5, right: 30, left: 20, bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
-      </LineChart>
-    </ResponsiveContainer>
+    <div>
+      <Line ref={chartRef} data={chartData} options={options} />
+    </div>
   );
-}
-
-export const transformDataForGraph = (invoices: Invoice[], period: 'daily' | 'weekly' | 'monthly') => {
-  const groupedData: { [key: string]: number } = {};
-
-  invoices.forEach(invoice => {
-    const date = new Date(invoice.date);
-    const startOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
-    let key = '';
-
-    switch (period) {
-      case 'daily':
-        key = date.toISOString().split('T')[0]; // YYYY-MM-DD
-        break;
-      case 'weekly':
-        key = startOfWeek.toISOString().split('T')[0]; // YYYY-MM-DD
-        break;
-      case 'monthly':
-        key = `${date.getFullYear()}-${date.getMonth() + 1}`; // YYYY-MM
-        break;
-    }
-
-    if (!groupedData[key]) {
-      groupedData[key] = 0;
-    }
-    groupedData[key] += invoice.totalAmount;
-  });
-
-  return Object.keys(groupedData).map(date => ({ date, revenue: groupedData[date] }));
-}
+};
 
 export default TimeSeriesGraph;

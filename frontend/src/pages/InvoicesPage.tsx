@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import InvoiceCard from '../components/InvoiceCard';
-import InvoiceForm from '../components/InvoiceForm';
 import { fetchInvoices } from '../store/invoiceSlice';
-import { Invoice } from '../types';
-import TimeSeriesGraph, { transformDataForGraph } from '../components/TimeSeriesGraph';
+import TimeSeriesGraph from '../components/TimeSeriesGraph';
 import { useAppDispatch, useAppSelector } from '../hooks';
+import InvoiceList from '../components/InvoiceList';
+import { transformDataForGraph } from '../utils/dataTransform';
 
 const InvoicesPage: React.FC = () => {
   const invoices = useAppSelector((state) => state.invoices.invoices);
   const dispatch = useAppDispatch();
   const invoiceStatus = useSelector((state: RootState) => state.invoices.status);
   const [graphData, setGraphData] = useState<{ date: string, revenue: number }[]>([]);
+  const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   useEffect(() => {
     console.log('invoiceStatus', invoiceStatus)
@@ -27,17 +27,39 @@ const InvoicesPage: React.FC = () => {
     }
   }, [invoices]);
 
+  const handlePeriodChange = (newPeriod: 'daily' | 'weekly' | 'monthly') => {
+    setPeriod(newPeriod);
+  };
+
   return (
-    <div>
-      <InvoiceForm />
-      <div>
-        {Array.isArray(invoices) && invoices.map((invoice: Invoice) => (
-          <InvoiceCard key={invoice.id} invoice={invoice} />
-        ))}
+    <div className="container mx-auto p-4">
+      <div className="max-w-screen-lg mx-auto p-4 bg-white shadow-md rounded-lg">
+        <div className="mt-8">
+          <div className="flex justify-center mb-4">
+            <button
+              onClick={() => handlePeriodChange('daily')}
+              className={`px-4 py-2 mx-2 ${period === 'daily' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'} rounded-md`}
+            >
+              Daily
+            </button>
+            <button
+              onClick={() => handlePeriodChange('weekly')}
+              className={`px-4 py-2 mx-2 ${period === 'weekly' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'} rounded-md`}
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => handlePeriodChange('monthly')}
+              className={`px-4 py-2 mx-2 ${period === 'monthly' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'} rounded-md`}
+            >
+              Monthly
+            </button>
+          </div>
+          <TimeSeriesGraph data={graphData} period={period} />
+        </div>
+        <InvoiceList />
       </div>
-      <TimeSeriesGraph data={graphData} />
     </div>
   );
 };
-
 export default InvoicesPage;

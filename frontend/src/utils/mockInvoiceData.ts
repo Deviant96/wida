@@ -1,0 +1,28 @@
+const mockInvoiceData = [
+  { date: "2023-07-01", revenue: 150000 },
+  { date: "2023-08-01", revenue: 175000 },
+  { date: "2023-09-01", revenue: 200000 },
+  { date: "2023-10-01", revenue: 225000 },
+  { date: "2023-11-01", revenue: 250000 },
+  { date: "2023-12-01", revenue: 275000 },
+  { date: "2024-01-01", revenue: 300000 },
+  { date: "2024-02-01", revenue: 325000 },
+  { date: "2024-03-01", revenue: 350000 },
+  { date: "2024-04-01", revenue: 375000 },
+  { date: "2024-05-01", revenue: 400000 },
+  { date: "2024-06-01", revenue: 425000 },
+  { date: "2024-07-01", revenue: 450000 },
+  { date: "2024-08-01", revenue: 475000 },
+  { date: "2024-09-01", revenue: 500000 },
+  { date: "2024-10-01", revenue: 525000 },
+  { date: "2024-11-01", revenue: 550000 },
+  { date: "2024-12-01", revenue: 575000 },
+  { date: "2025-01-01", revenue: 600000 },
+  { date: "2025-02-01", revenue: 625000 },
+  { date: "2025-03-01", revenue: 650000 },
+  { date: "2025-04-01", revenue: 675000 },
+  { date: "2025-05-01", revenue: 700000 },
+  { date: "2025-06-01", revenue: 725000 },
+];
+
+export default mockInvoiceData;
