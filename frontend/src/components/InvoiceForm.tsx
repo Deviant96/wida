@@ -21,11 +21,12 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onClose }) => {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [productSuggestions, setProductSuggestions] = useState<Product[]>([]);
+  const productsApiEnpoint: string = import.meta.env.VITE_ALL_PRODUCTS_API_ENDPOINT as string;
 
   const fetchProducts = async () => {
     try {
       setIsLoadingProducts(true);
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get(productsApiEnpoint);
       setProductSuggestions(response.data);
       setIsLoadingProducts(false);
     } catch (error) {

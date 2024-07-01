@@ -7,7 +7,7 @@ import Modal from './Modal';
 import InvoiceForm from './InvoiceForm';
 import { PiPlusBold } from 'react-icons/pi';
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = import.meta.env.VITE_INVOICE_LIST_MAX_ITEM;
 
 const InvoiceList: React.FC = () => {
   const invoices = useSelector((state: RootState) => state.invoices.invoices);
